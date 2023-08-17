@@ -1,50 +1,52 @@
 import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { handler } from "../../../src/services/spaces/handler";
 
-
-const someItems = [{
+const someItems = [
+  {
     id: {
-        S: '123'
+      S: "123",
     },
     location: {
-        S: 'Paris'
-    }
-}]
+      S: "Paris",
+    },
+  },
+];
 
-jest.mock('@aws-sdk/client-dynamodb', () => {
-    return {
-        DynamoDBClient: jest.fn().mockImplementation(() => {
-            return {
-                send: jest.fn().mockImplementation(() => {
-                    return {
-                        Items: someItems
-                    }
-                })
-            }
+jest.mock("@aws-sdk/client-dynamodb", () => {
+  return {
+    DynamoDBClient: jest.fn().mockImplementation(() => {
+      return {
+        send: jest.fn().mockImplementation(() => {
+          return {
+            Items: someItems,
+          };
         }),
-        ScanCommand: jest.fn()
-    }
+      };
+    }),
+    ScanCommand: jest.fn(),
+  };
 });
 
+describe("Spaces handler test suite", () => {
+  test("Returns spaces from dynamoDb", async () => {
+    const result = await handler(
+      {
+        httpMethod: "GET",
+      } as any,
+      {} as any
+    );
 
-describe('Spaces handler test suite', () => {
+    expect(result.statusCode).toBe(201);
+    const expectedResult = [
+      {
+        id: "123",
+        location: "Paris",
+      },
+    ];
+    const parsedResultBody = JSON.parse(result.body);
+    expect(parsedResultBody).toEqual(expectedResult);
 
-    test('Returns spaces from dynamoDb', async () => {
-        const result = await handler({
-            httpMethod: 'GET'
-        } as any, {} as any);
-
-        expect(result.statusCode).toBe(201);
-        const expectedResult = [{
-            id: '123',
-            location: 'Paris'
-        }];
-        const parsedResultBody = JSON.parse(result.body);
-        expect(parsedResultBody).toEqual(expectedResult);
-        
-        expect(DynamoDBClient).toHaveBeenCalledTimes(1);
-        expect(ScanCommand).toHaveBeenCalledTimes(1);
-    });
-
-
-})
+    expect(DynamoDBClient).toHaveBeenCalledTimes(1);
+    expect(ScanCommand).toHaveBeenCalledTimes(1);
+  });
+});
