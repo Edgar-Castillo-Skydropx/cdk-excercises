@@ -13,7 +13,7 @@ export async function postSpaces(
   item.id = randomId;
   validateAsSpaceEntry(item);
 
-  const result = await ddbClient.send(
+  await ddbClient.send(
     new PutItemCommand({
       TableName: process.env.TABLE_NAME,
       Item: marshall(item),

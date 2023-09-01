@@ -8,7 +8,7 @@ const spacesUrl = ApiStack.SpacesApiEndpoint36C4F3B6 + "spaces";
 export class DataService {
   private authService: AuthService;
   private s3Client: S3Client | undefined;
-  private awsRegion = "eu-west-1";
+  private awsRegion = "us-east-1";
 
   constructor(authService: AuthService) {
     this.authService = authService;
@@ -22,7 +22,7 @@ export class DataService {
     const getSpacesResult = await fetch(spacesUrl, {
       method: "GET",
       headers: {
-        Authorization: this.authService.jwtToken!,
+        Authorization: localStorage.getItem("token")!,
       },
     });
     const getSpacesResultJson = await getSpacesResult.json();
@@ -41,7 +41,7 @@ export class DataService {
       method: "POST",
       body: JSON.stringify(space),
       headers: {
-        Authorization: this.authService.jwtToken!,
+        Authorization: localStorage.getItem("token")!,
       },
     });
     const postResultJSON = await postResult.json();
@@ -62,7 +62,9 @@ export class DataService {
       ACL: "public-read",
       Body: file,
     });
+
     await this.s3Client.send(command);
+
     return `https://${command.input.Bucket}.s3.${this.awsRegion}.amazonaws.com/${command.input.Key}`;
   }
 

@@ -7,8 +7,8 @@ type CreateSpaceProps = {
 };
 
 type CustomEvent = {
-    target: HTMLInputElement
-}
+  target: HTMLInputElement;
+};
 
 export default function CreateSpace({ dataService }: CreateSpaceProps) {
   const [name, setName] = useState<string>("");
@@ -17,54 +17,63 @@ export default function CreateSpace({ dataService }: CreateSpaceProps) {
   const [actionResult, setActionResult] = useState<string>("");
 
   const handleSubmit = async (event: SyntheticEvent) => {
-    event.preventDefault();
-    if (name && location) {
-      const id = await dataService.createSpace(name, location, photo)
-      setActionResult(`Created space with id ${id}`);
-      setName('');
-      setLocation('');
-    } else {
-      setActionResult('Please provide a name and a location!')
+    try {
+      event.preventDefault();
+      if (name && location) {
+        const id = await dataService.createSpace(name, location, photo);
+        setActionResult(`Created space with id ${id}`);
+        setName("");
+        setLocation("");
+      } else {
+        setActionResult("Please provide a name and a location!");
+      }
+    } catch (error) {
+      console.info(error);
     }
-
-    
   };
 
-  function setPhotoUrl(event: CustomEvent){
+  function setPhotoUrl(event: CustomEvent) {
     if (event.target.files && event.target.files[0]) {
-        setPhoto(event.target.files[0]);
+      setPhoto(event.target.files[0]);
     }
   }
 
   function renderPhoto() {
     if (photo) {
-        const localPhotoURL = URL.createObjectURL(photo)
-        return <img alt='' src={localPhotoURL} style={{ maxWidth: "200px" }}/>
+      const localPhotoURL = URL.createObjectURL(photo);
+      return <img alt="" src={localPhotoURL} style={{ maxWidth: "200px" }} />;
     }
   }
 
-  function renderForm(){
+  function renderForm() {
     if (!dataService.isAuthorized()) {
-      return<NavLink to={"/login"}>Please login</NavLink>
+      return <NavLink to={"/login"}>Please login</NavLink>;
     }
     return (
       <form onSubmit={(e) => handleSubmit(e)}>
-        <label>Name:</label><br/>
-        <input value={name} onChange={(e) => setName(e.target.value)} /><br/>
-        <label>Location:</label><br/>
-        <input value={location} onChange={(e) => setLocation(e.target.value)} /><br/>
-        <label>Photo:</label><br/>
-        <input type="file" onChange={(e) => setPhotoUrl(e)} /><br/>
-        {renderPhoto()}<br/>
-        <input type="submit" value='Create space'/>
+        <label>Name:</label>
+        <br />
+        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <br />
+        <label>Location:</label>
+        <br />
+        <input value={location} onChange={(e) => setLocation(e.target.value)} />
+        <br />
+        <label>Photo:</label>
+        <br />
+        <input type="file" onChange={(e) => setPhotoUrl(e)} />
+        <br />
+        {renderPhoto()}
+        <br />
+        <input type="submit" value="Create space" />
       </form>
     );
   }
 
-  return <div>
-    {renderForm()}
-    {actionResult? <h3>{actionResult}</h3>: undefined}
-  </div>
-
-  
+  return (
+    <div>
+      {renderForm()}
+      {actionResult ? <h3>{actionResult}</h3> : undefined}
+    </div>
+  );
 }

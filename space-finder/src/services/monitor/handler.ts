@@ -5,12 +5,13 @@ const webHookUrl =
 
 async function handler(event: SNSEvent, context) {
   for (const record of event.Records) {
-    await fetch(webHookUrl, {
+    /*await fetch(webHookUrl, {
       method: "POST",
       body: JSON.stringify({
         text: `Huston, we have a problem: ${record.Sns.Message}`,
       }),
-    });
+    });*/
+    console.info("High Error", record.Sns.Message);
   }
 }
 

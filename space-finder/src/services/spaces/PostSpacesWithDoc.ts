@@ -15,7 +15,6 @@ export async function postSpacesWithDoc(
   const result = await ddbDocClient.send(
     new PutItemCommand({
       TableName: process.env.TABLE_NAME,
-
       Item: item,
     })
   );
